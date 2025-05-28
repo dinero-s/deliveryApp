@@ -5,15 +5,19 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="d85db39c-0673-4b7f-808c-278380b57d8b" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/src/controllers/ads.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/controllers/chat.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/controllers/index.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/controllers/user.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/service/ads.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/service/chat.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/service/user.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/package-lock.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/package.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docker-compose.yml" beforeDir="false" afterPath="$PROJECT_DIR$/docker-compose.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/controllers/ads.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/controllers/ads.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/controllers/chat.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/controllers/chat.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/controllers/index.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/controllers/index.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/controllers/user.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/controllers/user.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/index.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/index.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/router/index.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/models/adsModel.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/models/adsModel.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/models/chatModel.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/models/chatModel.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/models/userModel.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/models/userModel.js" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -75,7 +79,8 @@
       <updated>1748404403498</updated>
       <workItem from="1748404404729" duration="7346000" />
       <workItem from="1748412072022" duration="71000" />
-      <workItem from="1748426284251" duration="715000" />
+      <workItem from="1748426284251" duration="1061000" />
+      <workItem from="1748434875008" duration="2658000" />
     </task>
     <servers />
   </component>
