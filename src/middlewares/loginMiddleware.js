@@ -22,7 +22,6 @@ const userMiddleWare = (req, res, next) => {
             process.env.JWT_SECRET,
             { expiresIn: '1h' }
         );
-        console.log(token)
         next();
     })(req, res, next);
 };

@@ -8,8 +8,4 @@ const UserSchema = new Schema({
     contactPhone: {type: String},
 })
 
-UserSchema.methods.verifyPassword = function(password) {
-    return compareSync(password, this.hashPassword);
-};
-
 module.exports = model('UserModel', UserSchema);

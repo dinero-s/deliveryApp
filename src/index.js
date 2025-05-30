@@ -3,7 +3,6 @@ const app = express();
 require('dotenv').config();
 const controller = require('./controllers')
 const mongoose = require('mongoose');
-const session = require('express-session');
 const passport = require('passport');
 
 const PORT = process.env.PORT || 3000;
