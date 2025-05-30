@@ -14,15 +14,7 @@ mongoose.connect('mongodb://root:example@localhost:27017/deliveryDB?authSource=a
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
 
-app.use(session({
-    secret: 'Secret',
-    resave: false,
-    saveUninitialized: false,
-    cookie: { secure: false }
-}));
-
 app.use(passport.initialize());
-app.use(passport.session());
 
 controller(app);
 

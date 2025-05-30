@@ -1,40 +1,41 @@
 const bcrypt = require('bcrypt');
 const UserModel = require('../models/userModel');
 const passport = require('passport');
-const {compare} = require("bcrypt");
+const JwtStrategy = require('passport-jwt').Strategy;
+const ExtractJwt = require('passport-jwt').ExtractJwt;
 const LocalStrategy = require('passport-local').Strategy;
 
-passport.use(new LocalStrategy( {
-        usernameField: 'email',
-        passwordField: 'password'
-    },
-    async (email, password, done) => {
-
-        try {
-            const user = await UserModel.findOne({ email });
-            if (!user) return done(null, false);
-            const isPasswordValid = await user.verifyPassword(password);
-            if (!isPasswordValid) return done(null, false);
-
-            return done(null, user);
-        } catch (err) {
-            return done(err);
-        }
-    }
-));
-
-passport.serializeUser((user, done) => {
-    done(null, user._id);
-});
-
-passport.deserializeUser(async (id, done) => {
+passport.use(new LocalStrategy({
+    usernameField: 'email',
+    passwordField: 'password'
+}, async (email, password, done) => {
     try {
-        const user = await UserModel.findById({_id: id});
-        done(null, user);
+        const user = await UserModel.findOne({ email });
+        if (!user) return done(null, false, { message: 'Пользователь не найден' });
+
+        const isMatch = await bcrypt.compare(password, user.hashPassword);
+        if (!isMatch) return done(null, false, { message: 'Неверный пароль' });
+
+        return done(null, user);
     } catch (err) {
-        done(err);
+        return done(err);
     }
-});
+}));
+
+const jwtOptions = {
+    jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
+    secretOrKey: process.env.JWT_SECRET
+};
+
+passport.use(new JwtStrategy(jwtOptions, async (payload, done) => {
+    try {
+        const user = await UserModel.findById(payload.id);
+        if (user) return done(null, user);
+        return done(null, false);
+    } catch (err) {
+        return done(err, false);
+    }
+}));
 
 const createUser = async (req, res) => {
     const {email, password, name, contactPhone} = req.body;
