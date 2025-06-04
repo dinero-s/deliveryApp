@@ -1,6 +1,8 @@
 const AdsModel = require('../models/adsModel');
 const UserModel = require('../models/userModel');
 const jwt = require('jsonwebtoken');
+const path = require('path');
+const fs = require('fs');
 
 const createAd = async (req, res) => {
     const authHeader = req.headers.authorization;
@@ -105,6 +107,27 @@ const deleteAdById = async (req, res) => {
             return res.status(403).json({ error: "Вы не можете удалить чужое объявление" });
         }
 
+        if (ad.images && ad.images.length > 0) {
+            await Promise.all(ad.images.map(async (imagePath) => {
+                try {
+                    // Строим абсолютный путь к файлу
+                    const fullPath = path.join(__dirname, '..', 'public', imagePath);
+
+                    // Проверяем существует ли файл (не обязательно, unlink и так не падает если файла нет)
+                    await fs.access(fullPath);
+
+                    // Удаляем файл
+                    await fs.unlink(fullPath);
+                    console.log(`Файл удалён: ${fullPath}`);
+                } catch (err) {
+                    // Если файла нет - это не ошибка, просто пропускаем
+                    if (err.code !== 'ENOENT') {
+                        console.error(`Ошибка при удалении файла ${imagePath}:`, err);
+                    }
+                }
+            }));
+        }
+
         await AdsModel.deleteOne({ _id: ad._id })
         res.status(200).json(`Объявление с ID: ${ad._id} было удалено`)
     } catch (error) {
@@ -112,9 +135,34 @@ const deleteAdById = async (req, res) => {
     }
 }
 
+const findAdByParams = async (req, res) => {
+    const {shortTitle, description, userID, tags} = req.body
+    const query = {};
+
+    if (!req.body || Object.keys(req.body).length === 0) {
+        return res.status(400).json({ error: "Тело запроса не может быть пустым" });
+    }
+    if (shortTitle) {
+        query.shortTitle = { $regex: shortTitle, $options: 'i' };
+    }
+    if (description) {
+        query.description = { $regex: description, $options: 'i' };
+    }
+    if (userID) {
+        query.userID = userID;
+    }
+    if (tags && tags.length > 0) {
+        query.tags = { $all: tags };
+    }
+
+    const adDB = await AdsModel.find(query);
+    res.status(200).json({ data: adDB });
+}
+
 module.exports = {
     createAd,
     findAdById,
     getAllAds,
-    deleteAdById
+    deleteAdById,
+    findAdByParams
 };

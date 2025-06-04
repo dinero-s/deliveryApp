@@ -9,6 +9,7 @@ router.post('/advertisements', passport.authenticate('jwt', { session: false }),
 router.get('/advertisements/:id', adsService.findAdById)
 router.get('/advertisements', adsService.getAllAds)
 router.delete('/advertisements/:id', passport.authenticate('jwt', { session: false }), adsService.deleteAdById)
+router.post('/getAdByParams', adsService.findAdByParams)
 
 
 module.exports = router;
