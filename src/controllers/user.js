@@ -4,8 +4,8 @@ const userService = require('../service/user');
 const userMiddleWare = require('../middlewares/loginMiddleware')
 
 router.post('/signup', userService.createUser);
-router.post('/getUserByEmail', userService.getUserByEmail);
 router.post('/signin', userMiddleWare, userService.authUser);
+router.post('/getUserByEmail', userService.getUserByEmail);
 
 
 module.exports = router;

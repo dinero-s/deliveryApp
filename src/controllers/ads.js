@@ -6,6 +6,9 @@ const passport = require('passport');
 
 
 router.post('/advertisements', passport.authenticate('jwt', { session: false }), upload.array('images', 5), adsService.createAd);
+router.get('/advertisements/:id', adsService.findAdById)
+router.get('/advertisements', adsService.getAllAds)
+router.delete('/advertisements/:id', passport.authenticate('jwt', { session: false }), adsService.deleteAdById)
 
 
 module.exports = router;

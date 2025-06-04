@@ -11,10 +11,10 @@ passport.use(new LocalStrategy({
 }, async (email, password, done) => {
     try {
         const user = await UserModel.findOne({ email });
-        if (!user) return done(null, false, { message: 'Пользователь не найден' });
+        if (!user) return done(null, false, { message: 'Неверный email или пароль' });
 
         const isMatch = await bcrypt.compare(password, user.hashPassword);
-        if (!isMatch) return done(null, false, { message: 'Неверный пароль' });
+        if (!isMatch) return done(null, false, { message: 'Неверный email или пароль' });
 
         return done(null, user);
     } catch (err) {
@@ -40,6 +40,14 @@ passport.use(new JwtStrategy(jwtOptions, async (payload, done) => {
 const createUser = async (req, res) => {
     const {email, password, name, contactPhone} = req.body;
     try {
+        const emailDB = await UserModel.findOne({email});
+        if (emailDB) {
+            return res.status(400).json(
+                {
+                    error: "email занят",
+                    status: "error"
+                });
+        }
         const hashPassword = await bcrypt.hash(password, 10);
         const data = {
             email,
@@ -47,8 +55,16 @@ const createUser = async (req, res) => {
             name,
             contactPhone,
         }
-        const user = await UserModel.create(data);
-        res.json(user);
+        const userDB = await UserModel.create(data);
+        res.json({
+            data: {
+                id: userDB._id,
+                email: userDB.email,
+                name: userDB.name,
+                contactPhone: userDB.contactPhone
+            },
+            status: "ok"
+        });
     } catch (error) {
         return res.status(400).json({error});
     }
@@ -56,18 +72,17 @@ const createUser = async (req, res) => {
 
 const authUser = async (req, res) => {
     const {email} = req.body;
-    const user = await UserModel.findOne({email});
+    const userDB = await UserModel.findOne({email});
     try {
         const loginDataOk = {
             data: {
-                id: user._id,
-                email: user.email,
-                name: user.name,
-                contactPhone: user.contactPhone,
+                id: userDB._id,
+                email: userDB.email,
+                name: userDB.name,
+                contactPhone: userDB.contactPhone,
             },
             status: 'ok'
         }
-
         res.json(loginDataOk);
     } catch (error) {
         return res.status(400).json({error});

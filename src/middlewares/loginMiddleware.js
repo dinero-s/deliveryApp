@@ -18,10 +18,12 @@ const userMiddleWare = (req, res, next) => {
             return res.status(401).json({ message: errorMessage });
         }
         const token = jwt.sign(
-            { id: user._id, email: user.email },
+            { id: user._id, email: user.email, user: user.name },
             process.env.JWT_SECRET,
             { expiresIn: '1h' }
         );
+            req.token = token;
+            console.log(token)
         next();
     })(req, res, next);
 };
