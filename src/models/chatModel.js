@@ -1,4 +1,5 @@
 const {Schema, model} = require('mongoose');
+const messageSchema = require('./msgModel');
 
 const ChatSchema = new Schema({
     users: {type: [Schema.Types.ObjectId], required: true},
