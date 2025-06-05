@@ -9,8 +9,7 @@ module.exports = function(server) {
 
         socket.on('getHistory', async (interlocutorId) => {
             try {
-                const chat = await chatService.findChatBetweenUsers([currentUserId, interlocutorId]);
-                // ... остальная логика
+                await chatService.findChatBetweenUsers([currentUserId, interlocutorId]);
             } catch (err) {
                 console.error('Error:', err);
             }
@@ -21,7 +20,6 @@ module.exports = function(server) {
                 const { receiver, text } = data;
                 const chat = await chatService.getOrCreateChat([currentUserId, receiver]);
                 await chatService.addMessage(chat._id, currentUserId, text);
-                // ... рассылка сообщений
             } catch (err) {
                 console.error('Error:', err);
             }

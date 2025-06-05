@@ -2,17 +2,14 @@ const { Types } = require('mongoose');
 const ChatModel = require('../models/chatModel');
 
 const validateUsers = (users) => {
-    if (!Array.isArray(users)) {
-        throw new Error('Users must be an array');
+    if (!Array.isArray(users) || users.length !== 2) {
+        throw new Error(users.length !== 2
+            ? 'В чате должно быть 2 пользователя'
+            : 'Пользователи должны быть массивом');
     }
 
-    if (users.length !== 2) {
-        throw new Error('Chat must contain exactly 2 users');
-    }
-
-    if (!users.every(id => Types.ObjectId.isValid(id))) {
-        throw new Error('All user IDs must be valid ObjectId');
-    }
+    const isValid = users.every(Types.ObjectId.isValid);
+    if (!isValid) throw new Error('ID всех пользователей должны быть типом ObjectId');
 
     return users.map(id => new Types.ObjectId(id)).sort();
 };
@@ -22,27 +19,35 @@ const findChatBetweenUsers = async users => {
         const sortedUsers = validateUsers(users);
         return await ChatModel.findOne({ users: sortedUsers });
     } catch (error) {
-        throw new Error(`Error finding chat: ${error.message}`);
+        throw new Error(`Ошибка поиска чата: ${error.message}`);
     }
 };
 
-const createChat = async (users) => {
-    try {
-        const validatedUsers = validateUsers(users);
-        return await ChatModel.create({ users: validatedUsers });
-    } catch (error) {
-        throw new Error(`Chat creation failed: ${error.message}`);
-    }
-};
-
-// Добавьте обработчик для POST /chat
-const createChatHandler = async (req, res) => {
+const createChat = async (req, res) => {
     try {
         const { users } = req.body;
-        const chat = await createChat(users);
+
+        if (!Array.isArray(users) || users.length !== 2) {
+            throw new Error(users.length !== 2
+                ? 'В чате должно быть 2 пользователя'
+                : 'Пользователи должны быть массивом');
+        }
+
+        if (!users.every(Types.ObjectId.isValid)) {
+            throw new Error('ID всех пользователей должны быть типом ObjectId');
+        }
+
+        const validatedUsers = users.map(id => new Types.ObjectId(id)).sort();
+
+        const chat = await ChatModel.create({ users: validatedUsers });
         res.status(201).json(chat);
+
     } catch (error) {
-        res.status(400).json({ error: error.message });
+        res.status(400).json({
+            error: error.message.startsWith('Не удалось создать чат:')
+                ? error.message
+                : `Не удалось создать чат: ${error.message}`
+        });
     }
 };
 
@@ -50,7 +55,7 @@ const getChatById = async (chatId) => {
     try {
         return await ChatModel.findById(chatId);
     } catch (error) {
-        throw new Error(`Error finding chat: ${error.message}`);
+        throw new Error(`Ошибка поиска чата: ${error.message}`);
     }
 };
 
@@ -58,7 +63,7 @@ const sendMessage = async (chatId, authorId, text) => {
     try {
         const chat = await getChatById(chatId);
         if (!chat) {
-            throw new Error('Chat not found');
+            throw new Error('Чат не найден');
         }
 
         const newMessage = {
@@ -89,7 +94,6 @@ const getChatMessages = async (chatId) => {
     }
 };
 
-// Добавьте обработчики для новых endpoint'ов
 const sendMessageHandler = async (req, res) => {
     try {
         const { chatId } = req.params;
@@ -114,7 +118,6 @@ const getMessagesHandler = async (req, res) => {
 module.exports = {
     findChatBetweenUsers,
     createChat,
-    createChatHandler,
     sendMessage,
     sendMessageHandler,
     getChatMessages,
