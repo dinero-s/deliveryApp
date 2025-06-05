@@ -2,14 +2,13 @@ const AdsModel = require('../models/adsModel');
 const UserModel = require('../models/userModel');
 const jwt = require('jsonwebtoken');
 const path = require('path');
-const fs = require('fs');
+const fs = require('fs').promises;
 
 const createAd = async (req, res) => {
     const authHeader = req.headers.authorization;
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
         return res.status(401).json({ message: 'Токен не предоставлен' });
     }
-
     const token = authHeader.split(' ')[1];
     const {shortTitle, description} = req.body;
     const images = req.files?.map(file => ({
@@ -110,17 +109,19 @@ const deleteAdById = async (req, res) => {
         if (ad.images && ad.images.length > 0) {
             await Promise.all(ad.images.map(async (imagePath) => {
                 try {
-                    // Строим абсолютный путь к файлу
-                    const fullPath = path.join(__dirname, '..', 'public', imagePath);
+                    const imageName = path.basename(imagePath);
+                    const fullPath = path.join(__dirname, '..', 'public', 'ads', imageName);
 
-                    // Проверяем существует ли файл (не обязательно, unlink и так не падает если файла нет)
-                    await fs.access(fullPath);
+                    const safeDir = path.resolve(__dirname, '..', 'public', 'ads');
+                    const resolvedPath = path.resolve(fullPath);
 
-                    // Удаляем файл
+                    if (!resolvedPath.startsWith(safeDir)) {
+                        console.warn(`Попытка удаления файла вне разрешённой директории: ${resolvedPath}`);
+                        return;
+                    }
+
                     await fs.unlink(fullPath);
-                    console.log(`Файл удалён: ${fullPath}`);
                 } catch (err) {
-                    // Если файла нет - это не ошибка, просто пропускаем
                     if (err.code !== 'ENOENT') {
                         console.error(`Ошибка при удалении файла ${imagePath}:`, err);
                     }
