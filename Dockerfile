@@ -1,4 +1,10 @@
-FROM ubuntu:latest
-LABEL authors="dinarsabangulov"
+FROM node:20-alpine
 
-ENTRYPOINT ["top", "-b"]
+WORKDIR /app
+
+ARG NODE_ENV=production
+
+COPY ./*.json ./
+RUN npm install
+COPY ./src src/
+CMD ["node", "src/index.js"]
